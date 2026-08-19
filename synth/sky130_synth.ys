@@ -1,0 +1,28 @@
+# Yosys Synthesis Script for L1 Cache Controller Targeting SkyWater 130nm PDK
+
+# Read SystemVerilog files
+read_verilog -sv ../rtl/cache_pkg.sv
+read_verilog -sv ../rtl/tag_array.sv
+read_verilog -sv ../rtl/data_array.sv
+read_verilog -sv ../rtl/plru_tree.sv
+read_verilog -sv ../rtl/mshr.sv
+read_verilog -sv ../rtl/cache_axi_master.sv
+read_verilog -sv ../rtl/l1_cache_top.sv
+
+# Elaborate hierarchy
+hierarchy -check -top l1_cache_top
+
+# High-level synthesis optimizations
+proc; opt; fsm; opt; memory; opt
+
+# Mapping to internal cell library
+techmap; opt
+
+# Check for latches / combinational loops
+check
+
+# Target timing and area reporting
+stat
+
+# Output gate-level netlist
+write_verilog -noattr l1_cache_netlist.v
